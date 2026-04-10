@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>980 CMR 17.00 — Constructive Approval Process</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #EDF2F7;
+      font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      color: #1A202C;
+      min-height: 100vh;
+    }
+    /* Tab Nav */
+    .tab-bar {
+      background: #fff;
+      border-bottom: 2px solid #E2E8F0;
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    }
+    .tab-btn {
+      padding: 14px 36px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      color: #718096;
+      border-bottom: 3px solid transparent;
+      transition: all 0.15s;
+      font-family: inherit;
+    }
+    .tab-btn:hover { color: #2D3748; }
+    .tab-btn.active-a { color: #553C9A; border-bottom-color: #553C9A; }
+    .tab-btn.active-b { color: #1D6A5B; border-bottom-color: #1D6A5B; }
+    .tab-content { display: none; padding: 36px 16px; }
+    .tab-content.active { display: block; }
+    /* Workflow container */
+    .workflow { max-width: 660px; margin: 0 auto; }
+    /* Header card */
+    .header-card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 24px 28px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      margin-bottom: 24px;
+    }
+    .header-card .agency {
+      font-size: 10px; font-weight: 600; letter-spacing: 2px;
+      color: #A0AEC0; margin-bottom: 8px; text-transform: uppercase;
+    }
+    .header-card h1 {
+      font-size: 19px; font-weight: 700; margin-bottom: 10px;
+      color: #1A202C; line-height: 1.35;
+    }
+    .option-badge {
+      display: inline-block; font-size: 11px; font-weight: 600;
+      letter-spacing: 1px; padding: 4px 14px; border-radius: 4px; color: #fff;
+    }
+    .header-card .subtitle {
+      color: #A0AEC0; font-size: 11px; margin-top: 10px; line-height: 1.5;
+    }
+    /* Phase header */
+    .phase-header {
+      padding: 7px 14px;
+      border-radius: 0 6px 6px 0;
+      margin-bottom: 2px;
+      font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase;
+      border-left-width: 4px;
+      border-left-style: solid;
+    }
+    /* Step box */
+    .step-box {
+      background: #fff;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin: 6px 0;
+      cursor: pointer;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border-width: 1.5px;
+      border-style: solid;
+      border-color: #E2E8F0;
+      border-left-width: 4px;
+      border-left-style: solid;
+      transition: border-color 0.15s;
+    }
+    .step-box:hover { border-color: currentColor; }
+    .step-row {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .step-num {
+      border-radius: 50%; width: 26px; height: 26px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; flex-shrink: 0;
+      color: #fff;
+    }
+    .step-title { font-weight: 600; font-size: 13px; flex: 1; color: #1A202C; }
+    .step-chevron { color: #A0AEC0; font-size: 12px; margin-left: auto; }
+    .step-detail {
+      margin-top: 10px; padding-top: 10px;
+      border-top: 1px solid #EDF2F7;
+      color: #4A5568; font-size: 12px; line-height: 1.75;
+    }
+    .step-cite {
+      color: #A0AEC0; font-size: 11px; margin-top: 6px; font-style: italic;
+    }
+    /* Decision box */
+    .decision-box {
+      background: #FFFBEA;
+      border: 1.5px solid #B7791F;
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin: 6px 0;
+    }
+    .decision-header {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+    }
+    .decision-icon {
+      background: #B7791F; color: #fff;
+      width: 26px; height: 26px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 800; flex-shrink: 0;
+    }
+    .decision-label { color: #744210; font-weight: 700; font-size: 12px; }
+    .decision-text { color: #3D2B07; font-size: 13px; margin-bottom: 12px; line-height: 1.65; }
+    .decision-yes {
+      background: #F0FFF4; border: 1px solid #276749;
+      color: #276749; border-radius: 4px;
+      padding: 6px 12px; font-size: 12px; font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .decision-no {
+      background: #FFF5F5; border: 1px solid #9B2335;
+      color: #9B2335; border-radius: 4px;
+      padding: 6px 12px; font-size: 12px; font-weight: 600;
+    }
+    /* Note box */
+    .note-box {
+      background: #FAFAFA;
+      border-radius: 8px;
+      padding: 12px 16px; margin: 6px 0;
+      border-style: dashed; border-width: 1.5px;
+    }
+    .note-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+      margin-bottom: 6px; text-transform: uppercase;
+    }
+    .note-text { color: #4A5568; font-size: 12px; line-height: 1.75; }
+    .note-cite { color: #A0AEC0; font-size: 11px; margin-top: 6px; font-style: italic; }
+    /* Content box */
+    .content-box {
+      border-radius: 8px;
+      padding: 16px 20px; margin: 6px 0;
+      border-width: 1.5px; border-style: solid;
+      background: #F7FAFF;
+    }
+    .content-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+      margin-bottom: 12px; text-transform: uppercase;
+    }
+    .content-box ul { padding-left: 18px; }
+    .content-box li { color: #2D3748; font-size: 13px; line-height: 1.8; margin-bottom: 2px; }
+    /* Arrow */
+    .arrow { text-align: center; font-size: 16px; opacity: 0.5; margin: 1px 0; }
+    /* Footer */
+    .footer {
+      text-align: center; margin-top: 28px; padding-top: 16px;
+      border-top: 1px solid #CBD5E0;
+      color: #A0AEC0; font-size: 11px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="tab-bar">
+  <button class="tab-btn active-a" id="tab-a" onclick="switchTab('a')">
+    Option A — Presiding Officer-Led Draft
+  </button>
+  <button class="tab-btn" id="tab-b" onclick="switchTab('b')">
+    Option B — Applicant-Led Draft
+  </button>
+</div>
+
+<div id="content-a" class="tab-content active"></div>
+<div id="content-b" class="tab-content"></div>
+
+<script>
+  function switchTab(tab) {
+    document.getElementById('content-a').classList.toggle('active', tab === 'a');
+    document.getElementById('content-b').classList.toggle('active', tab === 'b');
+    document.getElementById('tab-a').className = 'tab-btn' + (tab === 'a' ? ' active-a' : '');
+    document.getElementById('tab-b').className = 'tab-btn' + (tab === 'b' ? ' active-b' : '');
+  }
+</script>
+
+<script type="text/babel">
+const { useState } = React;
+
+const optionASteps = [
+  {
+    phase: "Phase 1: Initiation",
+    accent: "#2C5282",
+    bg: "#E2E8F0",
+    steps: [
+      { id:"1", title:"Application Filed", detail:"Applicant submits Application to EFSB for a Clean Energy Infrastructure Facility (CEIF).", cite:"980 CMR 17.01(2)" },
+      { id:"2", title:"Completeness Determination", detail:"Presiding Officer reviews and confirms Applicant substantially complied with all Application filing requirements.", cite:"980 CMR 13.06" },
+      { id:"3", title:"Statutory Review Timeframe Begins", detail:"Review clock starts. Board must issue a Consolidated Permit or Consolidated State Permit by the applicable statutory deadline.", cite:"980 CMR 13.02(4)(a)" }
+    ]
+  },
+  {
+    phase: "Phase 2: Monitoring",
+    accent: "#276749",
+    bg: "#E2E8F0",
+    steps: [
+      { id:"4", title:"Procedural Assessment", detail:"Between 60–90 days before the applicable deadline, the Presiding Officer assesses whether the Board will timely issue a Consolidated Permit or Consolidated State Permit.", cite:"980 CMR 17.02(1)" },
+      { id:"5", title:"Decision Point: Reasonable Assurance?", isDecision:true, detail:"Does the Presiding Officer have reasonable assurance the Board will meet its deadline?", yesLabel:"YES — Normal proceeding continues toward Final Decision", noLabel:"NO — Constructive Approval track begins" }
+    ]
+  },
+  {
+    phase: "Phase 3: Constructive Approval Track Initiated",
+    accent: "#9B2335",
+    bg: "#E2E8F0",
+    steps: [
+      { id:"6", title:"Notice of Likelihood of Constructive Approval", detail:"At least 60 days before the deadline, the Presiding Officer issues Notice to Parties, Limited Participants, Permit Enforcement Agencies (PEAs), and the Board. Notice states the reasons for the assessment.", cite:"980 CMR 17.02(2)" }
+    ]
+  },
+  {
+    phase: "Phase 4 — Option A: Draft Preparation (Presiding Officer-Led)",
+    accent: "#553C9A",
+    bg: "#EDE9FA",
+    isOption: true,
+    steps: [
+      { id:"7", title:"Conditions Conference (if needed)", detail:"If the Notice was issued before the Conditions Conference, the Presiding Officer may schedule one earlier than specified in 980 CMR 13.07(6). The Presiding Officer issues Recommended Permit Conditions and Requirements. Parties may comment consistent with 980 CMR 13.07(3).", cite:"980 CMR 17.02(5)" },
+      { id:"8", title:"Presiding Officer Prepares & Circulates Draft", detail:"Within 2 weeks of the Notice, the Presiding Officer prepares and issues the Draft Constructive Approval Permit to Parties, Limited Participants, PEAs, and the Board. The draft is based on: (i) the Application as of the Completeness Determination plus any updates; and (ii) the Presiding Officer's Recommended Permit Conditions and Requirements.", cite:"980 CMR 17.02(3), Option A" },
+      { id:"9", title:"Comment Period — 7 to 14 Days", detail:"Recipients may file written comments on the draft to ensure compliance with 980 CMR 17.03 (Contents and Form). The Presiding Officer sets the exact window.", cite:"980 CMR 17.02(4)(a)" },
+      { id:"10", title:"Applicant Revises Draft", detail:"Within 7 days after the comment period closes, the Applicant updates the draft. Revisions must not be inconsistent with: (i) record evidence; (ii) the Board's statutory authority; or (iii) the Board's applicable rules and regulations. The Applicant circulates the updated draft to the service list.", cite:"980 CMR 17.02(4)(b)" },
+      { id:"11", title:"Presiding Officer May Modify", detail:"Within 7 days of the Applicant's updated draft, the Presiding Officer may modify the draft to the extent it remains inconsistent with: (i) record evidence; (ii) the Board's statutory authority; or (iii) the Board's applicable rules and regulations. The Presiding Officer ensures compliance with 980 CMR 17.03.", cite:"980 CMR 17.02(4)(c)" },
+      { id:"12", title:"Final Draft Established", detail:"The draft as updated and modified pursuant to 980 CMR 17.02(4) is established as the final Constructive Approval Permit to be issued on the deadline date.", cite:"980 CMR 17.02(4)(d)" }
+    ]
+  },
+  {
+    phase: "Phase 5: Issuance",
+    accent: "#276749",
+    bg: "#E2E8F0",
+    steps: [
+      { id:"—", title:"Board's Continuing Right to Issue a Final Decision", isNote:true, detail:"Neither the Presiding Officer's likelihood assessment nor the issuance of the draft Constructive Approval Permit prevents the Board from issuing a Final Decision on a Consolidated Permit or Consolidated State Permit prior to the applicable deadline.", cite:"980 CMR 17.02(6)" },
+      { id:"13", title:"Decision Point: Did Board Issue Permit by Deadline?", isDecision:true, detail:"Has the Board timely issued a Consolidated Permit or Consolidated State Permit?", yesLabel:"YES — Final Decision issued under 980 CMR 13.10", noLabel:"NO — Constructive Approval Permit is deemed issued by operation of law" },
+      { id:"14", title:"Constructive Approval Permit Deemed Issued", detail:"On the applicable deadline date, the draft Constructive Approval Permit is deemed issued as a final Constructive Approval Permit by operation of law under M.G.L. c. 164, §§ 69T, 69U, or 69V.", cite:"980 CMR 17.04(1)" },
+      { id:"15", title:"Presiding Officer Distributes Final Permit", detail:"Within 5 business days of the deadline date, the Presiding Officer distributes the final Constructive Approval Permit to all persons entitled to notice.", cite:"980 CMR 17.04(2)" },
+      { id:"16", title:"Evidentiary Record Closes", detail:"The evidentiary record closes upon distribution of the final Constructive Approval Permit.", cite:"980 CMR 17.04(3)" }
+    ]
+  },
+  {
+    phase: "Phase 6: Required Permit Contents",
+    accent: "#2C5282",
+    bg: "#E2E8F0",
+    steps: [
+      { id:"17", title:"Contents of the Constructive Approval Permit", isContent:true, contentItems:[
+        "Identifying Information — Applicant name, docket number, project name, representative contact information, and project description",
+        "Required Permits & Approvals — List of all state, regional, and local permits; agency permit requirements; draft permit documents; zoning statement",
+        "Common Conditions — Board Common Conditions, DOER Common Conditions, and PEA Common Conditions",
+        "Presiding Officer Recommended Permit Conditions and Requirements",
+        "Abbreviated Procedural History — Standard text reciting key dates and the basis for constructive approval",
+        "Statement of Decision's Effect and Appeal Rights"
+      ], cite:"980 CMR 17.03(1)" }
+    ]
+  },
+  {
+    phase: "Phase 7: Legal Effect & Appeal",
+    accent: "#9B2335",
+    bg: "#E2E8F0",
+    steps: [
+      { id:"18", title:"Effect of the Constructive Approval Permit", detail:"The Permit acts as an approval of all required permits and approvals from all state, regional, and local agencies needed to construct and operate the Project. No agency may require any additional approval or impose any law, ordinance, or rule that would delay or prevent construction, operation, or maintenance of the Project beyond the Permit's conditions.", cite:"980 CMR 17.05(1); M.G.L. c. 164 §§ 69T(i), 69U(c), 69V(c)" },
+      { id:"19", title:"Rights of Appeal", detail:"The Constructive Approval Permit is deemed a final decision and is subject to appeal under M.G.L. c. 164, § 69P. The appeal deadline runs from the date the Presiding Officer distributed the Permit.", cite:"980 CMR 17.05(2)" },
+      { id:"20", title:"Scope of Judicial Review", detail:"Review is limited to whether the Permit: (i) conforms with the Commonwealth and U.S. Constitutions; (ii) was made in accordance with established procedures under M.G.L. c. 164, §§ 69H–69O and §§ 69T–69W; (iii) was supported by substantial evidence; or (iv) was arbitrary, capricious, or an abuse of the Board's discretion.", cite:"980 CMR 17.05(3)" }
+    ]
+  }
+];
+
+const optionBSteps = [
+  {
+    phase: "Phase 1: Initiation",
+    accent: "#2C5282",
+    bg: "#E2E8F0",
+    steps: [
+      { id:"1", title:"Application Filed", detail:"Applicant submits Application to EFSB for a Clean Energy Infrastructure Facility (CEIF).", cite:"980 CMR 17.01(2)" },
+      { id:"2", title:"Completeness Determination", detail:"Presiding Officer reviews and confirms Applicant substantially complied with all Application filing requirements.", cite:"980 CMR 13.06" },
+      { id:"3", title:"Statutory Review Timeframe Begins", detail:"Review clock starts. Board must issue a Consolidated Permit or Consolidated State Permit by the applicable statutory deadline.", cite:"980 CMR 13.02(4)(a)" }
+    ]
+  },
+  {
+    phase: "Phase 2: Monitoring",
+    accent: "#276749",
+    bg: "#E2E8F0",
+    steps: [
+      { id:"4", title:"Procedural Assessment", detail:"Between 60–90 days before the applicable deadline, the Presiding Officer assesses whether the Board will timely issue a Consolidated Permit or Consolidated State Permit.", cite:"980 CMR 17.02(1)" },
+      { id:"5", title:"Decision Point: Reasonable Assurance?", isDecision:true, detail:"Does the Presiding Officer have reasonable assurance the Board will meet its deadline?", yesLabel:"YES — Normal proceeding continues toward Final Decision", noLabel:"NO — Constructive Approval track begins" }
+    ]
+  },
+  {
+    phase: "Phase 3: Constructive Approval Track Initiated",
+    accent: "#9B2335",
+    bg: "#E2E8F0",
+    steps: [
+      { id:"6", title:"Notice of Likelihood of Constructive Approval", detail:"At least 60 days before the deadline, the Presiding Officer issues Notice to Parties, Limited Participants, Permit Enforcement Agencies (PEAs), and the Board. Notice states the reasons for the assessment.", cite:"980 CMR 17.02(2)" }
+    ]
+  },
+  {
+    phase: "Phase 4 — Option B: Draft Preparation (Applicant-Led)",
+    accent: "#1D6A5B",
+    bg: "#E6F4F1",
+    isOption: true,
+    steps: [
+      { id:"7", title:"Conditions Conference (if needed)", detail:"If the Notice was issued before the Conditions Conference, the Presiding Officer may schedule one earlier than specified in 980 CMR 13.07(6). The Presiding Officer issues Recommended Permit Conditions and Requirements. Parties may comment consistent with 980 CMR 13.07(3).", cite:"980 CMR 17.02(5)" },
+      { id:"8", title:"Applicant Prepares & Circulates Draft", detail:"Within 2 weeks of the Notice, the Applicant prepares and circulates the Draft Constructive Approval Permit to the service list. The draft is based on: (i) the Application consistent with the Completeness Determination; (ii) applicable Common Conditions per 980 CMR 17.03(1)(c); and (iii) Recommended Permit Conditions and Requirements that the Applicant deems acceptable.", cite:"980 CMR 17.02(3), Option B" },
+      { id:"9", title:"Comment Period — 7 to 14 Days", detail:"Recipients may file written comments on the draft to ensure compliance with 980 CMR 17.03 (Contents and Form). The Presiding Officer sets the exact window.", cite:"980 CMR 17.02(4)" },
+      { id:"10", title:"Applicant Revises Draft", detail:"Within 7 days after the comment period closes, the Applicant updates the draft to include recommendations and revisions that it deems reasonable and consistent with the record of the proceeding. The Applicant circulates the updated draft to the service list.", cite:"980 CMR 17.02(4)" },
+      { id:"11", title:"Presiding Officer May Modify", detail:"Within 7 days of the Applicant's updated draft, the Presiding Officer may modify the draft to the extent it remains inconsistent with: (i) record evidence; (ii) the Board's statutory authority; or (iii) the Board's applicable rules and regulations. The Presiding Officer ensures compliance with 980 CMR 17.03.", cite:"980 CMR 17.02(4)" },
+      { id:"12", title:"Final Draft Established", detail:"The draft as updated and modified pursuant to 980 CMR 17.02(4) is established as the final Constructive Approval Permit to be issued on the deadline date.", cite:"980 CMR 17.02(4)" }
+    ]
+  },
+  {
+    phase: "Phase 5: Issuance",
+    accent: "#276749",
+    bg: "#E2E8F0",
+    steps: [
+      { id:"—", title:"Board's Continuing Right to Issue a Final Decision", isNote:true, detail:"Neither the Presiding Officer's likelihood assessment nor the issuance of the draft Constructive Approval Permit prevents the Board from issuing a Final Decision on a Consolidated Permit or Consolidated State Permit prior to the applicable deadline.", cite:"980 CMR 17.02(6)" },
+      { id:"13", title:"Decision Point: Did Board Issue Permit by Deadline?", isDecision:true, detail:"Has the Board timely issued a Consolidated Permit or Consolidated State Permit?", yesLabel:"YES — Final Decision issued under 980 CMR 13.10", noLabel:"NO — Constructive Approval Permit is deemed issued by operation of law" },
+      { id:"14", title:"Constructive Approval Permit Deemed Issued", detail:"On the applicable deadline date, the draft Constructive Approval Permit is deemed issued as a final Constructive Approval Permit by operation of law under M.G.L. c. 164, §§ 69T, 69U, or 69V.", cite:"980 CMR 17.04(1)" },
+      { id:"15", title:"Presiding Officer Distributes Final Permit", detail:"Within 5 business days of the deadline date, the Presiding Officer distributes the final Constructive Approval Permit to all persons entitled to notice.", cite:"980 CMR 17.04(2)" },
+      { id:"16", title:"Evidentiary Record Closes", detail:"The evidentiary record closes upon distribution of the final Constructive Approval Permit.", cite:"980 CMR 17.04(3)" }
+    ]
+  },
+  {
+    phase: "Phase 6: Required Permit Contents",
+    accent: "#2C5282",
+    bg: "#E2E8F0",
+    steps: [
+      { id:"17", title:"Contents of the Constructive Approval Permit", isContent:true, contentItems:[
+        "Identifying Information — Applicant name, docket number, project name, representative contact information, and project description",
+        "Required Permits & Approvals — List of all state, regional, and local permits; agency permit requirements; draft permit documents; zoning statement",
+        "Common Conditions — Board Common Conditions, DOER Common Conditions, and PEA Common Conditions",
+        "Presiding Officer Recommended Permit Conditions and Requirements",
+        "Abbreviated Procedural History — Standard text reciting key dates and the basis for constructive approval",
+        "Statement of Decision's Effect and Appeal Rights"
+      ], cite:"980 CMR 17.03(1)" }
+    ]
+  },
+  {
+    phase: "Phase 7: Legal Effect & Appeal",
+    accent: "#9B2335",
+    bg: "#E2E8F0",
+    steps: [
+      { id:"18", title:"Effect of the Constructive Approval Permit", detail:"The Permit acts as an approval of all required permits and approvals from all state, regional, and local agencies needed to construct and operate the Project. No agency may require any additional approval or impose any law, ordinance, or rule that would delay or prevent construction, operation, or maintenance of the Project beyond the Permit's conditions.", cite:"980 CMR 17.05(1); M.G.L. c. 164 §§ 69T(i), 69U(c), 69V(c)" },
+      { id:"19", title:"Rights of Appeal", detail:"The Constructive Approval Permit is deemed a final decision and is subject to appeal under M.G.L. c. 164, § 69P. The appeal deadline runs from the date the Presiding Officer distributed the Permit.", cite:"980 CMR 17.05(2)" },
+      { id:"20", title:"Scope of Judicial Review", detail:"Review is limited to whether the Permit: (i) conforms with the Commonwealth and U.S. Constitutions; (ii) was made in accordance with established procedures under M.G.L. c. 164, §§ 69H–69O and §§ 69T–69W; (iii) was supported by substantial evidence; or (iv) was arbitrary, capricious, or an abuse of the Board's discretion.", cite:"980 CMR 17.05(3)" }
+    ]
+  }
+];
+
+function StepBox({ step, accent }) {
+  const [open, setOpen] = useState(false);
+  if (step.isDecision) {
+    return (
+      <div className="decision-box">
+        <div className="decision-header">
+          <div className="decision-icon">?</div>
+          <div className="decision-label">Decision Point</div>
+        </div>
+        <div className="decision-text">{step.detail}</div>
+        <div className="decision-yes">✓  {step.yesLabel}</div>
+        <div className="decision-no">→  {step.noLabel}</div>
+      </div>
+    );
+  }
+  if (step.isNote) {
+    return (
+      <div className="note-box" style={{ borderColor: accent }}>
+        <div className="note-label" style={{ color: accent }}>⚑  Parallel Process Note</div>
+        <div className="note-text">{step.detail}</div>
+        <div className="note-cite">{step.cite}</div>
+      </div>
+    );
+  }
+  if (step.isContent) {
+    return (
+      <div className="content-box" style={{ borderColor: accent }}>
+        <div className="content-label" style={{ color: accent }}>Required Contents — 980 CMR 17.03(1)</div>
+        <ul>
+          {step.contentItems.map((item, i) => <li key={i}>{item}</li>)}
+        </ul>
+      </div>
+    );
+  }
+  return (
+    <div
+      className="step-box"
+      style={{ borderLeftColor: accent, borderColor: open ? accent : '#E2E8F0' }}
+      onClick={() => setOpen(!open)}
+    >
+      <div className="step-row">
+        <div className="step-num" style={{ background: accent }}>{step.id}</div>
+        <div className="step-title">{step.title}</div>
+        <div className="step-chevron">{open ? '▲' : '▼'}</div>
+      </div>
+      {open && (
+        <div className="step-detail">
+          {step.detail}
+          {step.cite && <div className="step-cite">{step.cite}</div>}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Arrow({ accent }) {
+  return <div className="arrow" style={{ color: accent }}>↓</div>;
+}
+
+function Workflow({ phases, badgeColor, badgeLabel, topBorderColor }) {
+  return (
+    <div className="workflow">
+      <div className="header-card" style={{ borderTop: `5px solid ${topBorderColor}` }}>
+        <div className="agency">Commonwealth of Massachusetts · Energy Facilities Siting Board</div>
+        <h1>980 CMR 17.00: Constructive Approval Process</h1>
+        <div className="option-badge" style={{ background: badgeColor }}>{badgeLabel}</div>
+        <div className="subtitle">Click any step to expand regulatory detail · Revised Proposed Regulations for Public Comment, April 3, 2026</div>
+      </div>
+
+      {phases.map((phase, pi) => (
+        <div key={pi} style={{ marginBottom: 4 }}>
+          <div className="phase-header" style={{ background: phase.bg, borderLeftColor: phase.accent, color: phase.accent }}>
+            {phase.phase}
+          </div>
+          {phase.steps.map((step, si) => (
+            <div key={si}>
+              <StepBox step={step} accent={phase.accent} />
+              {si < phase.steps.length - 1 && <Arrow accent={phase.accent} />}
+            </div>
+          ))}
+          {pi < phases.length - 1 && <Arrow accent={phases[pi + 1].accent} />}
+        </div>
+      ))}
+
+      <div className="footer">Regulatory Authority: M.G.L. c. 164, §§ 69T(i), 69U(c), 69V(c)</div>
+    </div>
+  );
+}
+
+ReactDOM.render(
+  <Workflow phases={optionASteps} badgeColor="#553C9A" badgeLabel="OPTION A — PRESIDING OFFICER-LED DRAFT" topBorderColor="#553C9A" />,
+  document.getElementById('content-a')
+);
+
+ReactDOM.render(
+  <Workflow phases={optionBSteps} badgeColor="#1D6A5B" badgeLabel="OPTION B — APPLICANT-LED DRAFT" topBorderColor="#1D6A5B" />,
+  document.getElementById('content-b')
+);
+</script>
